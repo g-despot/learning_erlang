@@ -1,5 +1,4 @@
 -module(demo).
-
 -export([get_module_info/2]).
 
 -define(BEAM_EXT, ".beam").
@@ -16,6 +15,7 @@ get_module_info(Dir, Tag) ->
     end,
     for_each_module(GetInfo, Dir).
 
+%% This function was copied from the presentation and doesn't seem to be working correctly.
 app_name(Dir) ->
     AbsName = filename:absname(Dir),
     case lists:reverse(filename:split(AbsName)) of

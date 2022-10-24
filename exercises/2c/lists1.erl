@@ -1,15 +1,8 @@
 -module(lists1).
--export([insert/2]).
+-export([insert/2, insertion_sort/1]).
 
-insert(X, SortedList) ->
-	insert_internal(X, SortedList, []).
+insert(X, []) -> [X];
+insert(X, SortedList = [H | _]) when X =< H -> [X | SortedList];
+insert(X, [H | T]) -> [H | insert(X, T)].
 
-insert_internal(X, [], _) ->
-	[X];
-insert_internal(X, [H|T], TmpList) ->
-	if
-		H >= X ->
-			TmpList ++ [X] ++ [H|T];
-		H < X ->
-			insert_internal(X, T, TmpList ++ [H])
-	end.
+insertion_sort(L) -> lists:foldl(fun insert/2, [], L).

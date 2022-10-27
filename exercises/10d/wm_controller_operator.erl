@@ -1,6 +1,6 @@
 -module(wm_controller_operator).
 
--export([start/0, add/0, remove/1, status/1, remote_ctrl/2, stop/0]).
+-export([start/0, add/0, remove/1, status/1, remote_ctrl/2, book_wm/1, stop/0]).
 
 -include("includes/definitions.hrl").
 
@@ -18,6 +18,9 @@ status(Id) ->
 
 remote_ctrl(Id, Action) ->
     server_call({remote_ctrl, Id, Action}).
+
+book_wm(FromPid) ->
+    server_call({FromPid, book_wm}).
 
 stop() ->
     server_call({stop}).

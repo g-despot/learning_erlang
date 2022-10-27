@@ -25,11 +25,19 @@ init([]) ->
 
 handle_call(Request, _From, State) ->
     case Request of
-        {test} ->
-            wm_logger:log("TEST");
         {register_acc, Username, Password} ->
             wm_logger:log("Registering account..."),
             register_acc(Username, Password);
+        {sign_in, Username, Password} ->
+            wm_logger:log("Signing in..."),
+            sign_in(Username, Password);
+        {sign_out} ->
+            wm_logger:log("Signing out..."),
+            sign_out();
+        {book_wm} ->
+            book_wm();
+        {remote_ctrl_wm, WMId, WMAction} ->
+            remote_ctrl_wm(WMId, WMAction);
         {stop} ->
             stop();
         _Other ->
@@ -55,6 +63,30 @@ start_wm_controller_operator() ->
 register_acc(Username, Password) ->
     ets:insert(accounts_table, {Username, crypto:hash(md5, Password)}),
     wm_logger:log("ETS_INSERT USERNAME: ~p PASSWORD: ~p", [Username, Password]).
+
+sign_in(Username, InputPassword) ->
+    [{Username, HashedPassword}] = ets:lookup(accounts_table, Username),
+    case crypto:hash(md5, InputPassword) of
+        HashedPassword ->
+            wm_logger:log("LOGGED IN: ~p", [Username]);
+        _Other ->
+            wm_logger:log("WRONG PASSWORD: ~p", [InputPassword])
+    end.
+
+sign_out() ->
+    ok.
+
+book_wm() ->
+    % Should be a message/cast/call and not a function call
+    ?WM_CTRL_OPERATOR:book_wm(self()),
+    receive
+        {WMId, booked} -> wm_logger:log("BOOKED WM: ~p", [WMId])
+    end,
+    WMId.
+
+remote_ctrl_wm(WMId, WMAction) ->
+    % Should be a message/cast/call and not a function call
+    ?WM_CTRL_OPERATOR:remote_ctrl(WMId, WMAction).
 
 stop() ->
     ok.

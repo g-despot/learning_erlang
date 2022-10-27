@@ -8,3 +8,4 @@
 -define(WM_EVENT_MANAGER, wm_logger_manager).
 
 -record(state, {}).
+-record(wm_ctrl_state, {max_wm = 20, start_up_wm = 5}).

@@ -10,7 +10,7 @@
 
 start() ->
     ?WM_SERVER:start(),
-    {ok, Pid} = gen_statem:start_link({local, ?WM_OPERATOR}, ?MODULE, [], []),
+    {ok, Pid} = gen_statem:start_link(?WM_OPERATOR, [], []),
     ctrl_server_call({register, Pid}).
 
 init(_Args) ->
@@ -19,8 +19,6 @@ init(_Args) ->
 
 idle(_, Message, #{prewash := PreWash} = Data) ->
     case Message of
-        {Option, Value} ->
-            {next_state, idle, Data#{Option := Value}};
         {start_sig} ->
             if
                 PreWash =:= on ->
@@ -30,9 +28,12 @@ idle(_, Message, #{prewash := PreWash} = Data) ->
                     server_cast(main_wash),
                     {next_state, main_wash, Data}
             end;
-        {where_you_at_sig} ->
+        {FromPid, where_you_at_sig} ->
+            FromPid ! {idle},
             wm_logger:log("STATE: idle"),
             {next_state, idle, Data};
+        {Option, Value} ->
+            {next_state, idle, Data#{Option := Value}};
         _Wrong ->
             {next_state, idle, Data}
     end.
@@ -47,7 +48,8 @@ prewash(_, Message, Data) ->
         {skip_sig} ->
             server_cast(main_wash),
             {next_state, main_wash, Data};
-        {where_you_at_sig} ->
+        {FromPid, where_you_at_sig} ->
+            FromPid ! {prewash},
             wm_logger:log("STATE: prewash"),
             {next_state, prewash, Data};
         _Wrong ->
@@ -64,7 +66,8 @@ main_wash(_, Message, #{quick_programme := _QuickProg} = Data) ->
         {skip_sig} ->
             server_cast(rinse),
             {next_state, rinse, Data};
-        {where_you_at_sig} ->
+        {FromPid, where_you_at_sig} ->
+            FromPid ! {main_wash},
             wm_logger:log("STATE: main_wash"),
             {next_state, main_wash, Data};
         _Wrong ->
@@ -86,7 +89,8 @@ rinse(_, Message, #{dry := Dry} = Data) ->
         {skip_sig} ->
             server_cast(dry),
             {next_state, dry, Data};
-        {where_you_at_sig} ->
+        {FromPid, where_you_at_sig} ->
+            FromPid ! {rinse},
             wm_logger:log("STATE: rinse"),
             {next_state, rinse, Data};
         _Wrong ->
@@ -99,7 +103,8 @@ dry(_, Message, Data) ->
             {next_state, idle, Data};
         {end_sig} ->
             {next_state, idle, Data};
-        {where_you_at_sig} ->
+        {FromPid, where_you_at_sig} ->
+            FromPid ! {dry},
             wm_logger:log("STATE: dry"),
             {next_state, dry, Data};
         _Wrong ->
@@ -147,3 +152,4 @@ server_cast(Message) ->
 
 ctrl_server_call(Message) ->
     gen_server:call({global, ?WM_CTRL_SERVER}, Message).
+

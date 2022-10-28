@@ -31,6 +31,8 @@ code_lock(LogicPid, SimPid) ->
                     io:format("The PIN ~p is incorrect.~n", [Pin]),
                     SimPid ! {display, "Locked"}
             end;
+        DigitsLeft when is_integer(DigitsLeft) ->
+            SimPid ! {display, integer_to_list(DigitsLeft) ++ " digits left"};
         Other ->
             io:format("Got unexpected: ~p~n", [Other])
     end,
@@ -47,6 +49,7 @@ wait_for_message() ->
 wait_for_message(Pid, N, Pin) when N > 0 ->
     receive
         {button, Button} ->
+            Pid ! N - 1,
             io:format("Pin input: ~p~n", [Button]),
             wait_for_message(Pid, N - 1, Pin ++ [Button]);
         Other ->

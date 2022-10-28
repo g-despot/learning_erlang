@@ -12,7 +12,7 @@ for_each_module_ets(Fun, Dir, TagAtom) ->
     {ok, Filenames} = file:list_dir(Dir),
     [Fun(File, TagAtom) || File <- Filenames, string:rstr(File, ?BEAM_EXT) =/= 0].
 
-%% B Read module info
+%% 7B Read module info
 get_module_info(Dir, Tag, Func) ->
     %% Make sure that Tag is a valid atom.
     if

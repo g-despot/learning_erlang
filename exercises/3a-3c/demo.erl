@@ -1,12 +1,13 @@
--module(maps3).
+-module(demo).
+
 -export([person/3, print_oldest/2]).
 
 person(Name, Age, Address) ->
     #{"Name" => Name, "Age" => Age, "Address" => Address}.
 
 print_oldest(
-    #{"Name" := Name1, "Age" := Age1, "Address" := Address1} = Person1,
-    #{"Name" := Name2, "Age" := Age2, "Address" := Address2} = Person2
+    #{"Name" := Name1, "Age" := Age1, "Address" := Address1} = _Person1,
+    #{"Name" := Name2, "Age" := Age2, "Address" := Address2} = _Person2
 ) ->
     if
         Age1 > Age2 ->

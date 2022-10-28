@@ -1,5 +1,9 @@
 # learning_erlang
 
+## Exercises
+
+Here you can find a list of solved Erlang exercises:
+
 1. [1A Starting from zero](./exercises/1a/README.md)
 2. [1B Temperature conversions](./exercises/1a/README.md)
 3. [1C Combining converters](./exercises/1a/README.md)

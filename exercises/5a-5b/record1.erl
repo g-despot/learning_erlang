@@ -1,12 +1,14 @@
 -module(record1).
+
 -export([create_index/1]).
 
 -record(person, {name, birth, index}).
 
 %% TODO: Fix this module. It should be much simpler.
 create_index(FileName) ->
+    {ok, Terms} = file:consult(FileName),
     %% This list is sorted by the date of birth.
-    Records = list_to_record(lists:keysort(2, element(2, file:consult(FileName))), [], 0),
+    Records = list_to_record(lists:keysort(2, Terms), [], 0),
     IndexedList = sort_list(Records, [], no),
     present(lists:keysort(#person.index, IndexedList)).
 

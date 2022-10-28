@@ -1,0 +1,11 @@
+-define(WM_OPERATOR, wm_operator).
+-define(WM_SERVER, wm_server).
+-define(WM_CTRL_OPERATOR, wm_controller_operator).
+-define(WM_CTRL_SERVER, wm_controller_server).
+-define(LCS_OPERATOR, lcs_operator).
+-define(LCS_SERVER, lcs_server).
+-define(WM_EVENT_HANDLER, wm_logger).
+-define(WM_EVENT_MANAGER, wm_logger_manager).
+
+-record(state, {}).
+-record(wm_ctrl_state, {max_wm = 20, start_up_wm = 5}).

@@ -1,5 +1,9 @@
--module(demo).
+-module(star).
 -export([start_proc/2]).
+
+start_proc(N, M) ->
+    Processes = lists:map(fun(_) -> spawn(fun wait_for_message/0) end, lists:seq(1, N)),
+    spawn(fun() -> play_ping_pong(Processes, Processes, M) end).
 
 %% 8D The star
 wait_for_message() ->
@@ -13,10 +17,6 @@ wait_for_message() ->
             io:format("Got ~p~n", [Other])
     end,
     wait_for_message().
-
-start_proc(N, M) ->
-    Processes = lists:map(fun(_) -> spawn(fun wait_for_message/0) end, lists:seq(1, N)),
-    spawn(fun() -> play_ping_pong(Processes, Processes, M) end).
 
 play_ping_pong([ToPid | Tail], AllProcesses, M) when M > 0, length(Tail) > 0 ->
     ToPid ! {self(), ping},
